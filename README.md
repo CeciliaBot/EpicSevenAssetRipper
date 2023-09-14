@@ -19,13 +19,13 @@ Python 3.7+
 
 ## How to install
 
-Download the code and extract it in a folder of your choice
+[Download the latest version](https://github.com/CeciliaBot/EpicSevenAssetRipper/releases/latest) and extract all the files in a folder of your choice.
 
 Open the command prompt (hold shift + right click inside the folder -> Power Shell on windows) and type
 
     pip install requirements.txt
 
-This should take care of the dependencies
+This should take care of all the dependencies required
 
 Now you can double click main.py or type py main.py in the command prompt to run the GUI
 
