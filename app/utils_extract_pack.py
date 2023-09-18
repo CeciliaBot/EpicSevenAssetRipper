@@ -34,7 +34,7 @@ def readBytesWhileDecrypting(file, size, key, offset):
 def readBytesPlain(file, size, key, offset):
     return file.read(size)
 
-def callHooks(cycle, file_format, file_path, tree, data):
+def callHooks(cycle, file_format, file_path, tree_file, data_bytes):
     try:
         hooks[cycle][file_format].main(file_path, data_bytes, tree_file)
     except KeyError: # no hook for file type
