@@ -23,7 +23,7 @@ Python 3.7+
 
 Open the command prompt (hold shift + right click inside the folder -> Power Shell on windows) and type
 
-    pip install requirements.txt
+    pip install -r requirements.txt
 
 This should take care of all the dependencies required
 
