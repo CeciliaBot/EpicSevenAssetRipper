@@ -6,6 +6,7 @@ from pathvalidate import sanitize_filepath
 from ..constants  import KEY, KEY_LEN
 from .bytearray   import ByteArray
 from .types       import FileType
+from .split_mmap  import FragmentedPackMemoryMap
 from typing       import TYPE_CHECKING
 if TYPE_CHECKING: from ..pack   import DataPack
 else: DataPack = None
@@ -49,6 +50,9 @@ class BasePackIO:
         self.mmap.seek(file['offset'])
 
         return self.mmap.read(file['size'])
+
+    def size(self):
+        return self.mmap.size()
 
     def close(self):
         self.mmap.close()
@@ -118,6 +122,8 @@ class EpicSevenDataPack(BasePackIO):
         self.read_bytes = pack.read_bytes
         if pack._is_encrypted:
             self.find = self._mmap_encrypted_find
+            # FragmentedPackMemoryMap works with single files but adds useless overhead, only use it if necessary
+            self.mmap = FragmentedPackMemoryMap(pack) if pack._parts else pack.mmap()
         else:
             self.find = self.mmap.find
     

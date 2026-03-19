@@ -85,7 +85,7 @@ class ByteArray(bytearray):
     
     @staticmethod
     def to_int(bytes: bytes, byteorder='little', signed=False):
-        int.from_bytes(bytes, byteorder=byteorder, signed=signed)
+        return int.from_bytes(bytes, byteorder=byteorder, signed=signed)
 
     @staticmethod
     def to_float(bytes: bytes, byteorder='little'):

@@ -16,6 +16,19 @@ def convert_size(size_bytes):
 def path_exists(path):
    return Path(path).exists()
 
+def get_pack_parts(path):
+    if path_exists(path + '~1'):
+        pack_index = 1
+        _parts = [ path, path + '~1' ]
+        while True:
+            pack_index+=1
+            if path_exists(path + f'~{pack_index}'):
+                _parts.append( path + f'~{pack_index}')
+            else:
+                break
+        return _parts
+    return None
+
 def fopen(path, write = False): # Cross platform os.open ( Used with fmap() )
     access = None
 

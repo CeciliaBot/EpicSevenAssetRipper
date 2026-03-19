@@ -34,7 +34,7 @@ def setLocale(locale: str = LOCALE):
             print(e)
 
 @staticmethod
-def translate(key: str, *args, **kwargs):
+def translate(key: str):
     try:
         return getattr(STRINGS, key)
     except Exception:

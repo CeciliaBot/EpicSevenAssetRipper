@@ -23,8 +23,9 @@ class HookClass:
 
         try:
             self.module = self._load_module()
-            self._is_enabled = getattr(self.module, '_IS_ENABLED_')
-        except Exception:
+            self._is_enabled = getattr(self.module, '_IS_ENABLED_', True)
+        except Exception as e:
+            print(e)
             pass
 
     def __load_module__(self):
@@ -66,9 +67,7 @@ class HookClass:
 
     def get_name(self):
         try:
-            name = getattr(self.module, '_ADDON_NAME_')
-        except AttributeError:
-            name = self.file_name
+            name = getattr(self.module, '_ADDON_NAME_', self.file_name)
         except Exception as e:
             name = self.file_name
             print(e)

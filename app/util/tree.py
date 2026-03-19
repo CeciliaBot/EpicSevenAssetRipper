@@ -155,7 +155,7 @@ def generate_dict_tree(pack: DataPack, thread: ThreadData):
 
     res: list[FolderType, FileType] = []
 
-    size = os.path.getsize(pack._path)
+    size = f.size() # os.path.getsize(pack._path)
 
     files_found = 0
 

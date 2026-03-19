@@ -1,9 +1,10 @@
 import configparser
-
+import os
+PREFERENCES_INI_PATH = os.path.join(os.getcwd(), 'settings.ini')
 
 config = configparser.ConfigParser()
 config.optionxform = str # Preserve casing
-config.read('settings.ini')
+config.read(PREFERENCES_INI_PATH)
 
 def _setter(section: str, option: str, value: str):
     if section != 'DEFAULT':
@@ -14,7 +15,7 @@ def _setter(section: str, option: str, value: str):
     writeSettings()
 
 def writeSettings():
-    with open('./settings.ini', 'w') as f:
+    with open(PREFERENCES_INI_PATH, 'w') as f:
         config.write(f)
 
 

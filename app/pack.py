@@ -1,5 +1,5 @@
 from .settings        import getAutosaveFileTree
-from .util.file       import path_exists, mmap, fopen
+from .util.file       import path_exists, get_pack_parts, mmap, fopen
 from .constants       import KEY, KEY_LEN
 from .util.types      import FileTreeType
 from .util.tree       import generate_dict_tree
@@ -17,6 +17,7 @@ class DataPack:
     _tree: FileTreeType = None
     _type: Literal['zip', 'tar', 'pack'] = None
     _is_encrypted: bool = False
+    _parts: list[str] = None
 
     def __init__(self, path):
         if path_exists(path):
@@ -37,6 +38,8 @@ class DataPack:
                 if header == b'\x71\x40\xBD\x73\x93':
                     self._is_encrypted = True
                     self.read_bytes = self._xor_read
+                    self._parts = get_pack_parts(self._path)
+                    if self._parts: print(f'Loaded data.pack and ~{len(self._parts) - 1} parts!')
                 elif header == b'\x50\x4C\x50\x63\x4B':
                     self._is_encrypted = False
                 else:
