@@ -11,6 +11,8 @@ import os
 import json
 from typing           import Literal
 
+from .util.SSRA import SSRA
+
 class DataPack:
     _path: str = None
     _file: int = None
@@ -18,6 +20,7 @@ class DataPack:
     _type: Literal['zip', 'tar', 'pack'] = None
     _is_encrypted: bool = False
     _parts: list[str] = None
+    _ssra: SSRA = None
 
     def __init__(self, path):
         if path_exists(path):
@@ -32,15 +35,18 @@ class DataPack:
                 self.read_bytes = self._zip_read_bytes
             else:
                 fmap = self.mmap()
-                header = fmap.read(5)
+                header = fmap.read(4)
                 fmap.close()
                 self._type= 'pack'
-                if header == b'\x71\x40\xBD\x73\x93':
+                if header == b'\x53\x53\x52\x41':
+                    self._type='SSRA'
+                    self._ssra = SSRA(self)
+                elif header == b'\x71\x40\xBD\x73': #\x93
                     self._is_encrypted = True
                     self.read_bytes = self._xor_read
                     self._parts = get_pack_parts(self._path)
                     if self._parts: print(f'Loaded data.pack and ~{len(self._parts) - 1} parts!')
-                elif header == b'\x50\x4C\x50\x63\x4B':
+                elif header == b'\x50\x4C\x50\x63': #\x4B
                     self._is_encrypted = False
                 else:
                     raise NotDataPackZip('not_data_pack_or_zip')

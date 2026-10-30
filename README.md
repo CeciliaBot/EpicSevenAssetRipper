@@ -40,7 +40,7 @@ After installing all the requirements open run.bat or run_no_console.vbs (if you
 
 <img width="900" height="730" alt="image" src="https://github.com/user-attachments/assets/00d005f6-f7c7-43db-8258-8ce088d7938d" />
 
-1. Select the data.pack to use (this tool supports data.pack, .tar, .zip (No password)
+1. Select the data.pack to use (this tool supports data.pack, .tar, .zip (No password) and rrsa manifest (make sure the chunks folder is in the same folder as the manifest)
 2. Generate file tree or load file tree from json file. After generating this tool will automatically save the result to tree.json in the same folder as the data.pack, this tool will also try to automatically load the "tree.json" file in the same directory as the data.pack
 3. All the assets inside the data.pack will now be displayed in the file tree. You can select and right click files to extract or preview. (You can enable automatic preview in the settings tab) Preview is only available for images only as of now.
 4. (Optional) You can use the compare function to remove unchanged nodes when comparing to older file trees

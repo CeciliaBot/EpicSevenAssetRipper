@@ -274,7 +274,7 @@ class CreateTab(QWidget):
             self,
             translate('select_decrypted_pack'),
             getDefaultFilePromptPath(),
-            "Pack (*.pack *.zip *.tar);;", # ;; to allow all files
+            "Pack (*.pack *.zip *.tar *.ssra);;", # ;; to allow all files
         )
         if fname:
             try:

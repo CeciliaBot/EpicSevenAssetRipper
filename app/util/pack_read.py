@@ -11,6 +11,12 @@ from typing       import TYPE_CHECKING
 if TYPE_CHECKING: from ..pack   import DataPack
 else: DataPack = None
 
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+
 # Mimik tarfile info
 MemberInfo = namedtuple('MemberInfo', ['name', 'size', 'offset_data', 'mtime', 'isfile'])
 
@@ -122,6 +128,7 @@ class EpicSevenDataPack(BasePackIO):
         self.read_bytes = pack.read_bytes
         if pack._is_encrypted:
             self.find = self._mmap_encrypted_find
+            if HAS_NUMPY: self.get_file_content = self.get_file_content_with_numpy
             # FragmentedPackMemoryMap works with single files but adds useless overhead, only use it if necessary
             self.mmap = FragmentedPackMemoryMap(pack) if pack._parts else pack.mmap()
         else:
@@ -181,6 +188,40 @@ class EpicSevenDataPack(BasePackIO):
         self.mmap.seek(file['offset'])
         return self.read_bytes(self.mmap, file['offset'], file['size'])
 
+    def get_file_content_with_numpy(self, file: FileType):
+        # assign this to self.get_file_content if HAS_NUMPY is true and pack is encrypted
+        # xor is performed on C level reducing the performance issue with python loops
+        
+        self.mmap.seek(file['offset'])
+        data = np.frombuffer(self.mmap.read(file['size']), dtype=np.uint8)
+        s = file['offset']%KEY_LEN
+        centred_key = KEY if s==0 else KEY[s:] + KEY[:s]
+        key = np.frombuffer( centred_key, dtype=np.uint8)
+        cycled_key = np.tile(key, len(data) // len(key) + 1)[:file['size']]
+        return ByteArray(np.bitwise_xor(data, cycled_key).tobytes())
+
+
+class YunaRRSAChunks(BasePackIO):
+    cursor = -1
+    def __init__(self, pack: DataPack):
+        super().__init__(pack)
+        self.info_table = self.pack._ssra.files
+
+    def next(self):
+        self.cursor+=1
+        if len(self.info_table) > self.cursor:
+            file = self.info_table[self.cursor]
+            if file['chunk']['chunk'].chunk_exists: # if the chunk file has not been download don't show the file in the tree map
+                return MemberInfo(name=file['name'], size=file['uncompressed_size'], offset_data=file['offset'], mtime=[], isfile=lambda: True)
+            else:
+                return self.next()
+        return None
+
+    def get_file_content(self, file: FileType):
+        data = self.pack._ssra.read_file_content(file['full_path'].strip())
+
+        return ByteArray(data if data else b'')
+
 
 def PackFileScanner(pack: DataPack):
     if pack._type == 'zip':
@@ -189,3 +230,5 @@ def PackFileScanner(pack: DataPack):
         return TarPack(pack)
     elif pack._type == 'pack':
         return EpicSevenDataPack(pack)
+    elif pack._type == 'SSRA':
+        return YunaRRSAChunks(pack)
